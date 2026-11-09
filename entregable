@@ -1,0 +1,11 @@
+1. ¿Cómo afectará JPA a la base de datos? ¿Qué tabla creará y qué columnas tendrá?
+JPA creará una tabla intermedia llamada producto_deparments para conectar ambas tablas. En una relación de muchos a muchos no se puede colocar una llave foránea directa en una sola tabla, por lo que se necesita esta tabla puente. Tendrá dos columnas: product_id (que guarda el ID de la categoría) y deparments_id (que guarda el ID del producto). Ambas columnas funcionan juntas como clave primaria para evitar registros duplicados.
+
+2. ¿Qué significa la anotación @JsonIgnore y por qué se utiliza en Producto?
+@JsonIgnore le indica a Spring que no incluya esa propiedad al transformar los datos a formato JSON para responder al cliente. La utilizo en la clase Producto para evitar un bucle infinito. Como una categoría contiene productos y cada producto contiene categorías, sin esta anotación el serializador intentaría mostrar ambos de forma interminable hasta agotar la memoria.
+
+3. ¿Cuál es la función del endpoint addProductoCategoria/{productId}/{categoriaId}?
+Su función es vincular un producto existente con una categoría existente en la base de datos. El método toma ambos identificadores de la ruta, busca cada registro en su respectiva tabla, añade el producto a la lista de la categoría y guarda el cambio. Al guardar la categoría en su repositorio, Hibernate se encarga de insertar la fila correspondiente en la tabla intermedia.
+
+4. ¿Por qué se declaran dos repositorios (categoriaRepo y productoRepo) en el controlador?
+Porque cada repositorio maneja las operaciones de una entidad distinta. Para realizar la vinculación correctamente, primero se debe comprobar que tanto el producto como la categoría existan en la base de datos. Se utiliza productoRepo para buscar el producto por su ID y categoriaRepo para buscar la categoría y guardar la asociación.
